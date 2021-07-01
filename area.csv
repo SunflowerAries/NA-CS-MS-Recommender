@@ -1,0 +1,32 @@
+area,abbrv
+All Areas,ai&vision&mlmining&nlp&ir&arch&comm&sec&mod&hpc&mobile&metrics&ops&plan&soft&da&bed&act&crypt&log&graph&chi&robotics&bio&visualization&ecom
+AI,ai&vision&mlmining&nlp&ir
+Artificial intelligence,ai
+Computer vision,vision
+Machine learning & data mining,mlmining
+Natural language processing,nlp
+The Web & information retrieval,ir
+Systems,arch&comm&sec&mod&hpc&mobile&metrics&ops&plan&soft&da&bed
+Computer architecture,arch
+Computer networks,comm
+Computer security,sec
+Databases,mod
+Design automation,da
+Embedded & real-time systems,bed
+High-performance computing,hpc
+Mobile computing,mobile
+Measurement & perf. analysis,metrics
+Operating systems,ops
+Programming languages,plan
+Software engineering,soft
+Theory,act&crypt&log
+Algorithms & complexity,act
+Cryptography,crypt
+Logic & verification,log
+Interdisciplinary Areas,graph&chi&robotics&bio&visualization&ecom
+Comp. bio & bioinformatics,bio
+Computer graphics,graph
+Economics & computation,ecom
+Human-computer interaction,chi
+Robotics,robotics
+Visualization,visualization
