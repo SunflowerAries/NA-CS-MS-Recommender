@@ -12,5 +12,3 @@ tofel gre gpa
 学费
 当地意识形态
 实习
-
-rank dept (Math.round(10.0 * v) / 10.0).toFixed(1) deptCounts[dept]

@@ -1,5 +1,8 @@
-import Papa = require('papaparse');
-import fs = require('fs');
+import 'reflect-metadata';
+import { parse } from 'papaparse';
+import { createReadStream } from 'fs';
+import { Connection, createConnection } from 'typeorm';
+import { Area } from './entity/Area';
 
 interface Author {
     name: string;
@@ -17,7 +20,7 @@ interface CountryInfo {
     readonly countryabbrv: string;
 };
 
-interface Area {
+interface AreaType {
     readonly area: string;
     readonly abbrv: string;
 };
@@ -27,9 +30,9 @@ interface AreaMap {
     readonly title: string;
 };
 
-const authorinfoFile = './generated-author-info.csv';
-const countryinfoFile = './country-info.csv';
-const areainfoFile = './area.csv';
+const authorinfoFile = './src/data/generated-author-info.csv';
+const countryinfoFile = './src/data/country-info.csv';
+const areainfoFile = './src/data/area.csv';
 
 const startyear = 2011;
 const endyear = 2021;
@@ -247,7 +250,7 @@ const countryAbbrv: { [key: string]: string } = {};
 const areaDeptAdjustedCount = {};
 const useDenseRankings: boolean = false;
 let authors: Author[] = [];
-let areas0: Area[] = [];
+let areas0: AreaType[] = [];
 
 const loadAuthors = async(): Promise<void> => {
     let position = 0;
@@ -267,9 +270,12 @@ const loadAuthors = async(): Promise<void> => {
         position++;
     }
 
-    const file = fs.createReadStream(authorinfoFile);
+    const file = createReadStream(authorinfoFile);
+    file.on('error', function() {
+        console.log('error');
+    });
     const data = await new Promise((resolve) => {
-        Papa.parse(file, {
+        parse(file, {
             header: true,
             complete: (results) => {
                 console.log("Finished:", results.data);
@@ -312,9 +318,9 @@ const countAuthorAreas = async(): Promise<void> => {
 }
 
 const loadCountryInfo = async(): Promise<void> => {
-    const file = fs.createReadStream(countryinfoFile);
+    const file = createReadStream(countryinfoFile);
     const data = await new Promise((resolve) => {
-        Papa.parse(file, {
+        parse(file, {
             header: true,
             complete: (results) => {
                 console.log("Finished:", results.data);
@@ -330,9 +336,9 @@ const loadCountryInfo = async(): Promise<void> => {
 }
 
 const loadAreaInfo = async(): Promise<void> => {
-    const file = fs.createReadStream(areainfoFile);
+    const file = createReadStream(areainfoFile);
     const data = await new Promise((resolve) => {
-        Papa.parse(file, {
+        parse(file, {
             header: true,
             complete: (results) => {
                 console.log("Finished:", results.data);
@@ -340,7 +346,7 @@ const loadAreaInfo = async(): Promise<void> => {
             }
         });
     });
-    areas0 = data as Area[];
+    areas0 = data as AreaType[];
 }
 
 function updateWeights(_areas: string[], weights: { [key: string]: number }): number {
@@ -525,7 +531,7 @@ function sortIndex(univagg: { [key: string]: number }): string[] {
     return keys;
 }
 
-const rank = async(): Promise<void> => {
+const rank = async(connection: Connection): Promise<void> => {
     const whichRegions = 'us';
     await loadAreaInfo();
     for (const area0 of areas0) {
@@ -568,6 +574,13 @@ const rank = async(): Promise<void> => {
                 if (dept in countryAbbrv) {
                     abbrv = countryAbbrv[dept];
                 }
+                const area = new Area();
+                area.area = area0.area;
+                area.rank = rank0;
+                area.department = dept;
+                area.count = Math.round(10.0 * v) / 10.0;
+                area.facultyNum = deptCounts[dept];
+                await connection.manager.save(area);
                 console.log(rank0 + ' ' + dept + ' ' + (Math.round(10.0 * v) / 10.0).toFixed(1) + ' ' + deptCounts[dept]);
                 ties++;
                 oldv = v;
@@ -576,10 +589,13 @@ const rank = async(): Promise<void> => {
     }
 }
 
-
-(async() => {
+createConnection().then(async(connection) => {
+    console.log('Successfully create connection');
     await loadAuthors();
+    console.log('Successfully load author info');
     await countAuthorAreas();
+    console.log('Successfully count author info');
     await loadCountryInfo();
-    await rank();
-})();
+    await rank(connection);
+    console.log('Successfully rank');
+}).catch(error => console.log(error));
