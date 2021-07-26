@@ -1,13 +1,12 @@
-MAPicker, an expert system which help students to pick up computer science school in USA based on items such as
+M.Sc.Picker, an expert system which help students to pick up computer science programs in USA based on items such as
 - basic requirements, e.g. TOEFL, GRE, GPA
 - tuition && fees
 - rankings, mainly come from csrankings.org
 - job opportunity
 - locals's attitudes towards China
 
-北美 CS 选校专家系统
-指标
-csranking 排名
+Information about the program of master comes from https://www.mastersportal.com, and if you want to crawl it yourself with crawler.py, you need to set the token in the python snippet that the website assigns to you when you've logged in with GMail account. The website seems to have a rate limiter, so about 400 iterations you need to check if the token has been changed and set the start of loop and output csv file.
+
 tofel gre gpa
 学费
 当地意识形态
